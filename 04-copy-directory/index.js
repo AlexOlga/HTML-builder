@@ -11,7 +11,6 @@ fs.readdir(dirName,(err, files)=>{
     files.forEach(item=>{
       const destFileName= destName+'\\'+item;
       const fileName= dirName+'\\'+item;
-      // console.log(fileName);
       fs.copyFile(fileName, destFileName,(err)=>{
         if (err) {console.log(err.message);}
         else {console.log('file copy');}
