@@ -1,28 +1,7 @@
 const fs = require('fs');
+const { promises: fsp } = fs;
 const path = require('path');
 const distName=path.join(__dirname, '/project-dist');
-
-// создать объект компанентов для замены
-const dirCompanents=path.join(__dirname, '/components');
-let companentObj={};
-
-fs.readdir(dirCompanents, (err,files)=>{
-  files.forEach(f=>{
-    const typeF=path.extname(f);  
-    const keyObj=f.replace(typeF,'');
-    const fileName=dirCompanents+'\\'+f;
-    const ReadStream = fs.createReadStream(fileName, 'utf-8');
-    let data='';
-    ReadStream.on('data', chunk => data += chunk);      
-    ReadStream.on('end',()=>{ companentObj[keyObj]= data;      
-    }  
-    );  
-             
-  });
-
-});
- 
-
 const assets=path.join(__dirname, '/assets');
 const assetsNew=distName+'/assets';
 
@@ -123,30 +102,47 @@ fs.readdir(dirStyles, { withFileTypes: true },(err, files)=>{
 }); 
 
 
-//создание index.html
-const originalFile=path.join(__dirname, 'template.html');
-const ReadStream = fs.createReadStream( originalFile, 'utf-8');
-let data = '';
-ReadStream.on('data', chunk => data += chunk);
-ReadStream.on('end',()=>{
-  let arr = data.split('{{');
-  arr=arr.map((item)=>{
-    //шаблонного тега нет
-    let index= item.indexOf('}}');
-    if (index==-1) {return item;}
-    // шаблонный тег есть
-    let subArr=item.split('}}');
-    
-    subArr[0]=companentObj[subArr[0].trim()];
-    item=subArr.join('');     
-    return item;});
-  //создаем index html и записываем в файл
-  data=arr.join('');
-  const htmlFile=path.join(__dirname, 'project-dist/index.html');
-  const output = fs.createWriteStream(htmlFile);
-  output.write(data);
 
-});
-  
+// создать объект компанентов для замены
+const dirCompanents=path.join(__dirname, '/components');
+const originalFile=path.join(__dirname, 'template.html');
+//const ReadStream = fs.createReadStream( originalFile, 'utf-8');
+var compArr=[];
+fsp.readFile( originalFile, 'utf-8')
+  .then((text)=>{
+    let arr = text.split('{{');
+    arr.forEach((item)=>{
+      // шаблонный тег есть
+      let index= item.indexOf('}}');
+      if (index !==-1) {
+        let subArr=item.split('}}');
+        compArr.push(subArr[0].trim());            
+      }
+    });
+    
+    var changeCompanent = function(compArr,i) {
+
+      const fileName=dirCompanents+'\\'+compArr[i]+'.html';
+     // console.log(fileName);
+      fsp.readFile(fileName, 'utf-8')
+        .then((data)=>{            
+          //заменяем  шаблонный тег прочитанным текстом
+          text=text.replace(`{{${compArr[i]}}}`, data);          
+          if(i < compArr.length-1) {
+            changeCompanent(compArr,i+1);
+          } else {
+            //создание index.html
+            const htmlFile=path.join(__dirname, 'project-dist/index.html');
+            const output = fs.createWriteStream(htmlFile);
+            output.write(text);
+          }
+        });
+    };
+    changeCompanent(compArr,0);
+  });
+
+
+
+
 
    
