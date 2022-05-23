@@ -13,7 +13,7 @@ fs.readdir(dirName,(err, files)=>{
       const fileName= dirName+'\\'+item;
       fs.copyFile(fileName, destFileName,(err)=>{
         if (err) {console.log(err.message);}
-        else {console.log('file copy');}
+       
       });    
     });
     //удалить 
