@@ -46,3 +46,4 @@ For up-to-date information, always use the official documentation!_
 - [Node.js file stats](https://nodejs.org/en/learn/manipulating-files/nodejs-file-stats)
 - [Node.js fs.readdir() Method](https://www.geeksforgeeks.org/node-js-fs-readdir-method/)
 - [Working with folders in Node.js](https://nodejs.org/en/learn/manipulating-files/working-with-folders-in-nodejs)
+пш
