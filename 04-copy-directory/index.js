@@ -40,3 +40,4 @@ function clearAndCopyDir(src, dest) {
 
 // Start the copying process
 clearAndCopyDir(srcPath, destPath);
+module.exports = { clearAndCopyDir };
